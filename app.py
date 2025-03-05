@@ -43,7 +43,7 @@ def main():
         discharged_to = st.slider('Discharge Destination Code', 1, 30, help="Code representing the discharge destination.")
     
     with col2:
-        st.image("image.webp", use_column_width=True)
+        st.image("image.webp", use_container_width=True)
     
     input_list = [[gender, age, admission_type_id, time_in_hospital, num_lab_procedures,
                    num_medications, number_inpatient, diag_1, diag_2, diag_3, metformin,

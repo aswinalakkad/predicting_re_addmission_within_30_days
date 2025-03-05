@@ -19,7 +19,7 @@ def prediction(input_data):
 # Streamlit UI
 def main():
     # Set page layout
-    st.set_page_config(page_title="Diabetes Readmission Prediction", layout="centered")
+    st.set_page_config(page_title="Diabetes Readmission Prediction", layout="wide")
 
     # Add a banner image
     st.image("image.webp", use_column_width=True)
@@ -28,8 +28,8 @@ def main():
     st.title("🏥 Early Readmission Prediction for Diabetic Patients")
     st.markdown("This app predicts if a diabetic patient is at **high risk of early readmission (within 30 days)**.")
 
-    # Layout using columns
-    col1, col2 = st.columns([1.5, 1])
+    # Layout using two columns for landscape view
+    col1, col2 = st.columns(2)
 
     with col1:
         st.subheader("🔢 Patient Information")
@@ -43,13 +43,15 @@ def main():
         diag_1 = st.number_input('Primary Diagnosis Code', step=1, help="ICD-9 code for the primary diagnosis.")
         diag_2 = st.number_input('Secondary Diagnosis Code', step=1, help="ICD-9 code for the secondary diagnosis.")
         diag_3 = st.number_input('Additional Diagnosis Code', step=1, help="ICD-9 code for another diagnosis.")
+    
+    with col2:
+        st.subheader("📌 Additional Information")
         metformin = st.selectbox('Metformin Use', [0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes')
         insulin = st.selectbox('Insulin Use', [1.0, 2.0, 3.0], format_func=lambda x: {1.0: 'No', 2.0: 'Up', 3.0: 'Steady'}[x])
         change = st.selectbox('Change in Medications', [0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes')
         diabetesMed = st.selectbox('Diabetes Medication', [0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes')
         discharged_to = st.slider('Discharge Destination Code', 1, 30, help="Code representing the discharge destination.")
-
-    with col2:
+    
         st.subheader("💡 Recommendations")
         st.markdown("""
         - **Monitor Blood Sugar Levels:** Keep glucose levels stable.

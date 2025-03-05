@@ -19,40 +19,39 @@ def prediction(input_data):
 # Streamlit UI
 def main():
     # Set page layout
-    st.set_page_config(page_title="Diabetes Readmission Prediction", layout="wide")
+    st.set_page_config(page_title="Diabetes Readmission Prediction", layout="centered")
 
     # Add a banner image
     st.image("image.webp", use_column_width=True)
 
     # App title and description
     st.title("🏥 Early Readmission Prediction for Diabetic Patients")
-    st.markdown("This application helps predict whether a diabetic patient is at **high risk of early hospital readmission (within 30 days)**.")
+    st.markdown("This app predicts if a diabetic patient is at **high risk of early readmission (within 30 days)**.")
 
-    # Professional layout using columns
+    # Compact layout using columns
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("🔢 Enter Patient Data")
-        
-        gender = st.selectbox('Gender (0 - Male, 1 - Female)', [0.0, 1.0])
-        age = st.number_input('Age Group (1: 0-10, ..., 10: 90-100)', min_value=1.0, max_value=10.0)
-        admission_type_id = st.selectbox('Admission Type', [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0])
-        time_in_hospital = st.number_input('Time in Hospital (Days)', min_value=1.0, max_value=30.0)
-        num_lab_procedures = st.number_input('Number of Lab Procedures', min_value=0.0)
-        num_medications = st.number_input('Number of Medications', min_value=0.0)
-        number_inpatient = st.number_input('Number of Inpatient Visits', min_value=0.0)
+        st.subheader("🔢 Basic Information")
+        gender = st.selectbox('Gender', [0.0, 1.0], format_func=lambda x: 'Male' if x == 0.0 else 'Female')
+        age = st.slider('Age Group', 1, 10)
+        admission_type_id = st.selectbox('Admission Type', range(1, 9))
+        time_in_hospital = st.slider('Hospital Stay (Days)', 1, 30)
+        num_lab_procedures = st.number_input('Lab Procedures', min_value=0, step=1)
+        num_medications = st.number_input('Medications', min_value=0, step=1)
+        number_inpatient = st.number_input('Previous Inpatient Visits', min_value=0, step=1)
 
     with col2:
         st.subheader("📌 Additional Details")
-
-        diag_1 = st.number_input('Primary Diagnosis Code')
-        diag_2 = st.number_input('Secondary Diagnosis Code')
-        diag_3 = st.number_input('Additional Diagnosis Code')
-        metformin = st.selectbox('Metformin Use (0 - No, 1 - Yes)', [0.0, 1.0])
-        insulin = st.selectbox('Insulin Use (1 - No, 2 - Up, 3 - Steady)', [1.0, 2.0, 3.0])
-        change = st.selectbox('Change in Medications (0 - No, 1 - Yes)', [0.0, 1.0])
-        diabetesMed = st.selectbox('Diabetes Medication (0 - No, 1 - Yes)', [0.0, 1.0])
-        discharged_to = st.number_input('Discharge Destination Code', min_value=1.0, max_value=30.0)
+        with st.expander("Click to enter diagnosis & medication details"):
+            diag_1 = st.number_input('Primary Diagnosis Code', step=1)
+            diag_2 = st.number_input('Secondary Diagnosis Code', step=1)
+            diag_3 = st.number_input('Additional Diagnosis Code', step=1)
+            metformin = st.selectbox('Metformin Use', [0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes')
+            insulin = st.selectbox('Insulin Use', [1.0, 2.0, 3.0], format_func=lambda x: {1.0: 'No', 2.0: 'Up', 3.0: 'Steady'}[x])
+            change = st.selectbox('Change in Medications', [0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes')
+            diabetesMed = st.selectbox('Diabetes Medication', [0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes')
+            discharged_to = st.slider('Discharge Destination Code', 1, 30)
 
     input_list = [[gender, age, admission_type_id, time_in_hospital, num_lab_procedures,
                    num_medications, number_inpatient, diag_1, diag_2, diag_3, metformin,
@@ -61,28 +60,26 @@ def main():
     # Prediction Button
     if st.button("🔍 Predict Readmission Risk"):
         response, advice = prediction(input_list)
-        st.subheader("🛑 Prediction Result")
-        st.write(f"**{response}**")
+        st.success(f"**{response}**")
         st.info(advice)
 
-    # Use Cases Section
-    st.markdown("---")
-    st.subheader("📊 Use Cases of Readmission Prediction")
-    st.markdown("""
-    - **Hospital Management:** Helps hospitals allocate resources for high-risk patients.
-    - **Patient Care Improvement:** Alerts healthcare providers to offer extra care.
-    - **Reducing Costs:** Prevents avoidable readmissions, reducing healthcare costs.
-    - **Insurance Optimization:** Helps insurance companies assess patient risk.
-    """)
-
-    # Suggestions for Patients
-    st.subheader("💡 Recommendations for Patients at High Risk")
-    st.markdown("""
-    - **Monitor Blood Sugar Levels:** Keep glucose levels in check.
-    - **Follow Prescribed Medications:** Avoid skipping or changing medications without consulting a doctor.
-    - **Healthy Lifestyle:** Exercise, eat a balanced diet, and manage stress.
-    - **Regular Follow-Ups:** Attend post-hospitalization checkups to prevent complications.
-    """)
+    # Use Cases & Suggestions (Collapsible)
+    with st.expander("📊 Use Cases & Recommendations"):
+        st.subheader("🔹 Use Cases of Readmission Prediction")
+        st.markdown("""
+        - **Hospital Management:** Allocate resources for high-risk patients.
+        - **Improved Patient Care:** Alerts healthcare providers for extra care.
+        - **Cost Reduction:** Prevents avoidable readmissions, reducing costs.
+        - **Insurance Optimization:** Helps insurers assess patient risk.
+        """)
+        
+        st.subheader("💡 Recommendations for High-Risk Patients")
+        st.markdown("""
+        - **Monitor Blood Sugar Levels:** Keep glucose levels stable.
+        - **Follow Medications Strictly:** Avoid skipping doses.
+        - **Healthy Lifestyle:** Exercise, eat well, manage stress.
+        - **Regular Follow-Ups:** Attend post-hospitalization checkups.
+        """)
 
 # Run the app
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ def main():
     st.set_page_config(page_title="Diabetes Readmission Prediction", layout="wide")
 
     # Add a banner image
-    st.image("hospital_banner.jpg", use_column_width=True)
+    st.image("image.webp", use_column_width=True)
 
     # App title and description
     st.title("🏥 Early Readmission Prediction for Diabetic Patients")

@@ -59,7 +59,7 @@ def main():
     change = st.radio('Change in Medications (0: No, 1: Yes)', [0, 1], horizontal=True)
     diabetesMed = st.radio('Diabetes Medication (0: No, 1: Yes)', [0, 1], horizontal=True)
 
-    discharged_to = st.number_input('Discharge Destination Code', min_value=1.0, max_value=30.0, step=.1)
+    discharged_to = st.number_input('Discharge Destination Code', min_value=1, max_value=30, step=1)
 
     input_list = [[
         float(gender), float(age), float(admission_type_id), float(time_in_hospital),

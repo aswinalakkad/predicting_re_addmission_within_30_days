@@ -1,4 +1,4 @@
-kkkkimport streamlit as st
+import streamlit as st
 import numpy as np
 import pickle
 
@@ -48,14 +48,7 @@ def main():
         8.0: 'Not Mapped'
     }.items(), format_func=lambda x: x[1])[0]
 
-    time_in_hospital = st.number_input(
-    '🛏️ Time in Hospital (Days)',
-    min_value=1,
-    max_value=30,
-    value=3,
-    step=1,
-    help='Enter the number of days the patient was hospitalized (1–30 days)'
-    )
+    time_in_hospital = st.slider('Time in Hospital (days):', min_value=1, max_value=30)
     num_lab_procedures = st.number_input('Number of Lab Procedures:', min_value=0)
     num_medications = st.number_input('Number of Medications:', min_value=0)
     number_inpatient = st.number_input('Number of Inpatient Visits:', min_value=0)
@@ -72,20 +65,14 @@ def main():
         2.0: 'Up',
         3.0: 'Steady'
     }.items(), format_func=lambda x: x[1])[0]
+
     change = st.radio('Change in Medications:', ['No', 'Yes'])
     change = 0.0 if change == 'No' else 1.0
 
     diabetesMed = st.radio('Diabetes Medication:', ['No', 'Yes'])
     diabetesMed = 0.0 if diabetesMed == 'No' else 1.0
 
-    discharged_to = st.number_input(
-    '🏥 Discharge Destination Code',
-    min_value=1,
-    max_value=30,
-    value=1,
-    step=1,
-    help='Enter a number between 1 and 30 representing the discharge destination'
-    )
+    discharged_to = st.number_input('Discharge Destination Code:', min_value=1.0, max_value=30.0)
 
     input_list = [[gender, age_group, admission_type_id, time_in_hospital, num_lab_procedures,
                    num_medications, number_inpatient, diag_1, diag_2, diag_3, metformin,

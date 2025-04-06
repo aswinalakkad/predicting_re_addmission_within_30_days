@@ -67,7 +67,7 @@ def main():
     metformin = st.radio('Metformin Use:', ['No', 'Yes'])
     metformin = 0.0 if metformin == 'No' else 1.0
 
-    insulin = st.selectbox('Insulin Use:', {
+    insulin = st.radio('Insulin Use:', {
         1.0: 'No',
         2.0: 'Up',
         3.0: 'Steady'

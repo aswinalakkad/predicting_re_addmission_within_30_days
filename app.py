@@ -67,11 +67,10 @@ def main():
     metformin = st.radio('Metformin Use:', ['No', 'Yes'])
     metformin = 0.0 if metformin == 'No' else 1.0
 
-    insulin = st.selectbox('Insulin Use:', {
-        1.0: 'No',
-        2.0: 'Up',
-        3.0: 'Steady'
-    }.items(), format_func=lambda x: x[1])[0]
+    insulin_label = st.radio('💉 Insulin Use', ['No', 'Up', 'Steady', 'Down'])
+    insulin_mapping = {'No': 0, 'Up': 1, 'Steady': 2, 'Down': 3}
+    insulin = insulin_mapping[insulin_label]
+
 
     change = st.radio('Change in Medications:', ['No', 'Yes'])
     change = 0.0 if change == 'No' else 1.0

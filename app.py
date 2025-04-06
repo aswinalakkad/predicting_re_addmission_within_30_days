@@ -6,72 +6,81 @@ import pickle
 with open('final_model.pkl', 'rb') as file:
     model = pickle.load(file)
 
+# Function to convert age to age group
+def get_age_group(age):
+    if age < 0:
+        return 1.0
+    elif age >= 100:
+        return 10.0
+    return float((age // 10) + 1)
+
 # Prediction function
 def prediction(input_data):
     pred = model.predict(input_data)[0]
     if pred == 1:
-        return '⚠️ High Risk of Early Readmission'
+        return '⚠️ High Risk of Readmission'
     else:
-        return '✅ Low Risk of Early Readmission'
+        return '✅ Low Risk of Readmission'
 
-# Main app
+# Main UI
 def main():
-    st.set_page_config(page_title="Diabetic Readmission Predictor", layout="centered")
-    st.title('🩺 Early Readmission Prediction for Diabetic Patients')
+    st.title('🧬 Early Readmission Risk Prediction')
+    st.subheader('For Diabetic Patients')
+    st.markdown('This tool predicts the **likelihood of early hospital readmission** for diabetic patients based on input features.')
+
     st.markdown('---')
-    st.markdown("""
-        This application uses a trained machine learning model to predict whether a **diabetic patient** is at **high risk of early hospital readmission**.
-        Please fill in the following patient information to receive a prediction.
-    """)
+    st.header('🔍 Patient Information')
 
-    st.markdown('### 👤 Demographics & Admission Info')
-    gender = st.radio('Gender', ['Male (0)', 'Female (1)'])
-    gender = 0.0 if 'Male' in gender else 1.0
+    gender = st.radio('Gender:', ['Male', 'Female'])
+    gender = 0.0 if gender == 'Male' else 1.0
 
-    age = st.slider('Age Group (1: 0-10, ..., 10: 90-100)', 1.0, 10.0, step=1.0)
-    admission_type_id = st.selectbox('Admission Type', {
-        1.0: 'Emergency', 2.0: 'Urgent', 3.0: 'Elective',
-        4.0: 'Newborn', 5.0: 'Not Available', 6.0: 'NULL',
-        7.0: 'Trauma Center', 8.0: 'Other'
-    })
+    age = st.number_input('Age (in years):', min_value=0, max_value=120, step=1)
+    age_group = get_age_group(age)
 
-    st.markdown('### 🏥 Hospital Stay Details')
-    time_in_hospital = st.number_input('Time in Hospital (days)', 1.0, 30.0)
-    num_lab_procedures = st.number_input('Number of Lab Procedures', 0.0)
-    num_medications = st.number_input('Number of Medications', 0.0)
-    number_inpatient = st.number_input('Number of Inpatient Visits', 0.0)
+    admission_type_id = st.selectbox('Admission Type:', {
+        1.0: 'Emergency',
+        2.0: 'Urgent',
+        3.0: 'Elective',
+        4.0: 'Newborn',
+        5.0: 'Not Available',
+        6.0: 'NULL',
+        7.0: 'Trauma Center',
+        8.0: 'Not Mapped'
+    }.items(), format_func=lambda x: x[1])[0]
 
-    st.markdown('### 🧬 Diagnosis Codes')
-    diag_1 = st.number_input('Primary Diagnosis Code (ICD-9)')
-    diag_2 = st.number_input('Secondary Diagnosis Code (ICD-9)')
-    diag_3 = st.number_input('Additional Diagnosis Code (ICD-9)')
+    time_in_hospital = st.slider('Time in Hospital (days):', min_value=1, max_value=30)
+    num_lab_procedures = st.number_input('Number of Lab Procedures:', min_value=0)
+    num_medications = st.number_input('Number of Medications:', min_value=0)
+    number_inpatient = st.number_input('Number of Inpatient Visits:', min_value=0)
 
-    st.markdown('### 💊 Medications & Treatment')
-    metformin = st.radio('Metformin Use', ['No (0)', 'Yes (1)'])
-    metformin = 0.0 if 'No' in metformin else 1.0
+    diag_1 = st.number_input('Primary Diagnosis Code (ICD-9):')
+    diag_2 = st.number_input('Secondary Diagnosis Code (ICD-9):')
+    diag_3 = st.number_input('Additional Diagnosis Code (ICD-9):')
 
-    insulin = st.selectbox('Insulin Use', {1.0: 'No', 2.0: 'Up', 3.0: 'Steady'})
-    change = st.radio('Change in Medications', ['No (0)', 'Yes (1)'])
-    change = 0.0 if 'No' in change else 1.0
+    metformin = st.radio('Metformin Use:', ['No', 'Yes'])
+    metformin = 0.0 if metformin == 'No' else 1.0
 
-    diabetesMed = st.radio('On Diabetes Medication', ['No (0)', 'Yes (1)'])
-    diabetesMed = 0.0 if 'No' in diabetesMed else 1.0
+    insulin = st.selectbox('Insulin Use:', {
+        1.0: 'No',
+        2.0: 'Up',
+        3.0: 'Steady'
+    }.items(), format_func=lambda x: x[1])[0]
 
-    discharged_to = st.number_input('Discharge Destination Code (1-30)', 1.0, 30.0)
+    change = st.radio('Change in Medications:', ['No', 'Yes'])
+    change = 0.0 if change == 'No' else 1.0
 
-    # Input list for model
-    input_list = [[
-        gender, age, float(admission_type_id), time_in_hospital,
-        num_lab_procedures, num_medications, number_inpatient,
-        diag_1, diag_2, diag_3, metformin, float(insulin),
-        change, diabetesMed, discharged_to
-    ]]
+    diabetesMed = st.radio('Diabetes Medication:', ['No', 'Yes'])
+    diabetesMed = 0.0 if diabetesMed == 'No' else 1.0
 
-    # Prediction button
-    if st.button('🔍 Predict Readmission Risk'):
-        with st.spinner('Analyzing patient data...'):
-            response = prediction(input_list)
-            st.success(response)
+    discharged_to = st.number_input('Discharge Destination Code:', min_value=1.0, max_value=30.0)
+
+    input_list = [[gender, age_group, admission_type_id, time_in_hospital, num_lab_procedures,
+                   num_medications, number_inpatient, diag_1, diag_2, diag_3, metformin,
+                   insulin, change, diabetesMed, discharged_to]]
+
+    if st.button('🔮 Predict Readmission Risk'):
+        response = prediction(input_list)
+        st.success(response)
 
 if __name__ == '__main__':
     main()

@@ -79,7 +79,14 @@ def main():
     diabetesMed = st.radio('Diabetes Medication:', ['No', 'Yes'])
     diabetesMed = 0.0 if diabetesMed == 'No' else 1.0
 
-    discharged_to = st.number_input('Discharge Destination Code:', min_value=1.0, max_value=30.0)
+    discharged_to = st.number_input(
+    '🏥 Discharge Destination Code',
+    min_value=1,
+    max_value=30,
+    value=1,
+    step=1,
+    help='Enter a number between 1 and 30 representing the discharge destination'
+    )
 
     input_list = [[gender, age_group, admission_type_id, time_in_hospital, num_lab_procedures,
                    num_medications, number_inpatient, diag_1, diag_2, diag_3, metformin,

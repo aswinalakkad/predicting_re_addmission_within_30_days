@@ -71,8 +71,6 @@ def main():
         0: 'No',
         1: 'Up',
         2: 'Steady'
-3:'down'
-
     }.items(), format_func=lambda x: x[1])[0]
 
     change = st.radio('Change in Medications:', ['No', 'Yes'])

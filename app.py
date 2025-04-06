@@ -68,4 +68,9 @@ def main():
         float(insulin), float(change), float(diabetesMed), float(discharged_to)
     ]]
 
-    if st.button
+    if st.button('Predict'):
+        result = prediction(input_list)
+        st.success(result)
+
+if __name__ == '__main__':
+    main()

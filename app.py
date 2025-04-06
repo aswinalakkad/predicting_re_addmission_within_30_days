@@ -48,7 +48,14 @@ def main():
         8.0: 'Not Mapped'
     }.items(), format_func=lambda x: x[1])[0]
 
-    time_in_hospital = st.slider('Time in Hospital (days):', min_value=1, max_value=30)
+    time_in_hospital = st.number_input(
+    '🛏️ Time in Hospital (Days)',
+    min_value=1,
+    max_value=30,
+    value=3,
+    step=1,
+    help='Enter the number of days the patient was hospitalized (1–30 days)'
+    )
     num_lab_procedures = st.number_input('Number of Lab Procedures:', min_value=0)
     num_medications = st.number_input('Number of Medications:', min_value=0)
     number_inpatient = st.number_input('Number of Inpatient Visits:', min_value=0)

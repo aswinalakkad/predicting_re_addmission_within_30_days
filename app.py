@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
-import pickle
+import pandas as pd
+import pickle 
 
 # Load the trained model
 with open('final_model.pkl', 'rb') as file:
@@ -13,74 +14,72 @@ def prediction(input_data):
     else:
         return 'Low Risk of Readmission'
 
-def convert_age_to_group(age):
-    # Convert age to group: 0-10 → 1, 10-20 → 2, ..., 90-100 → 10
-    return min(max(int(age // 10) + 1, 1), 10)
+def get_age_group(age):
+    if age < 10:
+        return 1.0
+    elif age < 20:
+        return 2.0
+    elif age < 30:
+        return 3.0
+    elif age < 40:
+        return 4.0
+    elif age < 50:
+        return 5.0
+    elif age < 60:
+        return 6.0
+    elif age < 70:
+        return 7.0
+    elif age < 80:
+        return 8.0
+    elif age < 90:
+        return 9.0
+    else:
+        return 10.0
 
 def main():
-    st.title('🏥 Early Readmission Prediction for Diabetic Patients')
-    st.subheader('Predicting if a diabetic patient is at high risk of early hospital readmission.')
+    st.title('Early Readmission Prediction for Diabetic Patients')
+    st.subheader('Predicts whether a diabetic patient is at high risk of early hospital readmission.')
     
-    st.markdown('---')
-    st.markdown('### 📝 Input Patient Data')
+    st.markdown('### Input Patient Data')
 
-    # Gender
-    gender = st.radio('Gender', options=[0.0, 1.0], format_func=lambda x: 'Male' if x == 0.0 else 'Female', horizontal=True)
+    gender = st.radio('Gender (0: Male, 1: Female)', [0.0, 1.0], horizontal=True)
+    age_input = st.number_input('Age', min_value=0, max_value=100, step=1)
+    age = get_age_group(age_input)
 
-    # Age (convert to group)
-    age = st.number_input('Age (in years)', min_value=1, max_value=99, step=1)
-    age_group = float(convert_age_to_group(age))
-
-    # Admission Type
-    admission_type_id = st.radio(
-        'Admission Type',
-        options=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
-        format_func=lambda x: f'Type {int(x)}',
-        horizontal=True
-    )
-
-    # Time in Hospital
-    time_in_hospital = st.number_input('Time in Hospital (days)', min_value=1.0, max_value=30.0, step=1.0)
-
-    # Lab Procedures
-    num_lab_procedures = st.number_input('Number of Lab Procedures', min_value=0.0, step=1.0)
-
-    # Medications
-    num_medications = st.number_input('Number of Medications', min_value=0.0, step=1.0)
-
-    # Inpatient Visits
-    number_inpatient = st.number_input('Number of Inpatient Visits', min_value=0.0, step=1.0)
-
-    # Diagnosis Codes
+    admission_type_id = st.selectbox('Admission Type (1: Emergency, 2: Urgent, 3: Elective, etc.)',
+                                     [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0])
+    
+    time_in_hospital = st.number_input('Time in Hospital (Days)', min_value=1.0, max_value=30.0, step=1.0)
+    
+    num_lab_procedures = st.number_input('Number of Lab Procedures', min_value=0.0)
+    num_medications = st.number_input('Number of Medications', min_value=0.0)
+    number_inpatient = st.number_input('Number of Inpatient Visits', min_value=0.0)
+    
     diag_1 = st.number_input('Primary Diagnosis Code')
     diag_2 = st.number_input('Secondary Diagnosis Code')
     diag_3 = st.number_input('Additional Diagnosis Code')
 
-    # Metformin
-    metformin = st.radio('Metformin Use', options=[0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes', horizontal=True)
+    metformin = st.radio('Metformin Use (0: No, 1: Yes)', [0.0, 1.0], horizontal=True)
 
-    # Insulin
-    insulin = st.radio(
-        'Insulin Use',
-        options=[0, 1, 2, 3],
-        format_func=lambda x: {0: 'No', 1: 'Up', 2: 'Steady', 3: 'Down'}[x],
-        horizontal=True
-    )
+    insulin_map = {
+        0: 'No',
+        1: 'Up',
+        2: 'Steady',
+        3: 'Down'
+    }
+    insulin_label = st.radio('Insulin Use', list(insulin_map.values()), horizontal=True)
+    insulin = float([k for k, v in insulin_map.items() if v == insulin_label][0])
 
-    # Change in Medications
-    change = st.radio('Change in Medications', options=[0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes', horizontal=True)
+    change = st.radio('Change in Medications (0: No, 1: Yes)', [0.0, 1.0], horizontal=True)
+    diabetesMed = st.radio('Diabetes Medication (0: No, 1: Yes)', [0.0, 1.0], horizontal=True)
 
-    # Diabetes Medication
-    diabetesMed = st.radio('Diabetes Medication', options=[0.0, 1.0], format_func=lambda x: 'No' if x == 0.0 else 'Yes', horizontal=True)
-
-    # Discharge Destination
     discharged_to = st.number_input('Discharge Destination Code', min_value=1.0, max_value=30.0, step=1.0)
 
-    input_list = [[gender, age_group, admission_type_id, time_in_hospital, num_lab_procedures,
+    input_list = [[gender, age, admission_type_id, time_in_hospital, num_lab_procedures,
                    num_medications, number_inpatient, diag_1, diag_2, diag_3, metformin,
                    insulin, change, diabetesMed, discharged_to]]
 
-    if st.button('🔍 Predict'):
+    if st.button('Predict'):
         response = prediction(input_list)
         st.success(response)
 

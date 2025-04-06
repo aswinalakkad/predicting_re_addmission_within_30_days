@@ -1,4 +1,4 @@
-import streamlit as st
+kkkkimport streamlit as st
 import numpy as np
 import pickle
 
@@ -68,9 +68,11 @@ def main():
     metformin = 0.0 if metformin == 'No' else 1.0
 
     insulin = st.radio('Insulin Use:', {
-        1.0: 'No',
-        2.0: 'Up',
-        3.0: 'Steady'
+        0: 'No',
+        1: 'Up',
+        2: 'Steady'
+        3: 'Down'
+
     }.items(), format_func=lambda x: x[1])[0]
 
     change = st.radio('Change in Medications:', ['No', 'Yes'])
